@@ -40,7 +40,7 @@ class ControlActivity: AppCompatActivity() {
     private var mCamera: Camera? = null
     private var mPreview: CameraPreview? = null
 
-    private val TAG: String = "Camera API"
+    private val TAG: String = "CameraV2"
 
     private val mPicture = Camera.PictureCallback { data, _ ->
         val pictureFile: File = getOutputMediaFile(MEDIA_TYPE_IMAGE) ?: run {
@@ -86,8 +86,7 @@ class ControlActivity: AppCompatActivity() {
 
 
         // This button will be used
-        control_led_disconnect.setOnClickListener { mCamera?.takePicture(null, null, mPicture)
-        Log.d(TAG, "Picture Taken ! ")}
+        control_led_disconnect.setOnClickListener { mCamera?.takePicture(null, null, mPicture)}
 
     }
 
@@ -102,6 +101,8 @@ class ControlActivity: AppCompatActivity() {
                 Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES),
                 "MyCameraApp"
         )
+
+        Log.d(TAG, mediaStorageDir.absolutePath)
         // This location works best if you want the created images to be shared
         // between applications and persist after your app has been uninstalled.
 
@@ -215,6 +216,16 @@ class ControlActivity: AppCompatActivity() {
         }
 
 
+    }
+
+    override fun onPause() {
+        super.onPause()
+        releaseCamera()
+    }
+
+    private fun releaseCamera() {
+        mCamera?.release() // release the camera for other applications
+        mCamera = null
     }
 
 
