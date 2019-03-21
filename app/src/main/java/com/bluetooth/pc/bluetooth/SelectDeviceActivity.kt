@@ -40,6 +40,8 @@ class SelectDeviceActivity : AppCompatActivity() {
             startActivityForResult(enableBluetoothIntent, REQUEST_ENABLE_BLUETOOTH)
         }
 
+
+
         select_device_refresh.setOnClickListener{ pairedDeviceList() }
 
     }
