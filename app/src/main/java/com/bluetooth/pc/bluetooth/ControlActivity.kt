@@ -25,6 +25,9 @@ import java.io.*
 import java.nio.file.Files.exists
 import java.text.SimpleDateFormat
 
+data class Picture (var filePath: String, var time: String) {
+
+}
 class ControlActivity: AppCompatActivity() {
 
     companion object {
@@ -39,6 +42,7 @@ class ControlActivity: AppCompatActivity() {
     // Camera setup
     private var mCamera: Camera? = null
     private var mPreview: CameraPreview? = null
+    private var mTakenPicture: Picture? = null
 
     private val TAG: String = "CameraV2"
 
@@ -86,7 +90,7 @@ class ControlActivity: AppCompatActivity() {
 
 
         // This button will be used
-        control_led_disconnect.setOnClickListener { mCamera?.takePicture(null, null, mPicture)}
+        control_led_disconnect.setOnClickListener { }
 
     }
 
@@ -118,9 +122,11 @@ class ControlActivity: AppCompatActivity() {
 
         // Create a media file name
         val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss").format(Date())
+        val pathname = "${mediaStorageDir.path}${File.separator}IMG_$timeStamp.jpg"
+        mTakenPicture = Picture(pathname, timeStamp)
         return when (type) {
             MEDIA_TYPE_IMAGE -> {
-                File("${mediaStorageDir.path}${File.separator}IMG_$timeStamp.jpg")
+                File(pathname)
             }
             else -> null
         }
@@ -208,12 +214,21 @@ class ControlActivity: AppCompatActivity() {
 
                 // Read from the InputStream
                 bytes = mmInStream.read(buffer)
-                val readMessage = String(buffer, 0, bytes)
+                val distance = String(buffer, 0, bytes).toInt()
                 // Send the obtained bytes to the UI Activity
-                Log.d("BT_Socket", readMessage)
+
+                if(distance < 100) {
+                    // Take picture
+                    // Send it to firebase
+                    // Wait 10s before taking another picture
+                }
+
+
 
             }
         }
+
+
 
 
     }
@@ -226,6 +241,9 @@ class ControlActivity: AppCompatActivity() {
     private fun releaseCamera() {
         mCamera?.release() // release the camera for other applications
         mCamera = null
+    }
+    private fun doTakePicture() {
+        mCamera?.takePicture(null, null, mPicture)
     }
 
 
