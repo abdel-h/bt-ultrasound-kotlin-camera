@@ -39,22 +39,31 @@ class ControlActivity: AppCompatActivity() {
         lateinit var m_address: String
     }
 
+    // Firebase handler
+    var firebaseWrapper: FirebaseWrapper = FirebaseWrapper()
+
     // Camera setup
     private var mCamera: Camera? = null
     private var mPreview: CameraPreview? = null
     private var mTakenPicture: Picture? = null
 
-    private val TAG: String = "CameraV2"
+    private val TAG: String = "CameraV3"
 
     private val mPicture = Camera.PictureCallback { data, _ ->
         val pictureFile: File = getOutputMediaFile(MEDIA_TYPE_IMAGE) ?: run {
-            Log.d(TAG, ("Error creating media file, check storage permissions"))
+            Log.d(TAG, "Error creating media file, check storage permissions")
             return@PictureCallback
         }
 
         try {
             val fos = FileOutputStream(pictureFile)
             fos.write(data)
+            // upload the file to Firebase
+            firebaseWrapper.uploadFileByPath(pictureFile.absolutePath) {
+                Log.d(TAG, it)
+            }
+            Log.d(TAG, "Writing File: Success")
+            Log.d(TAG, pictureFile.absolutePath)
             fos.close()
         } catch (e: FileNotFoundException) {
             Log.d(TAG, "File not found: ${e.message}")
@@ -69,10 +78,12 @@ class ControlActivity: AppCompatActivity() {
         // m_address = intent.getStringExtra(SelectDeviceActivity.EXTRA_ADDRESS)
         // ConnectToDevice(this).execute()
 
+        // Setup firebase
+
 
         // Control Buttons
-        control_led_on.setOnClickListener { sendCommand("a") }
-        control_led_off.setOnClickListener { readDataFromBT() }
+        // control_led_on.setOnClickListener { sendCommand("a") }
+        // control_led_off.setOnClickListener { readDataFromBT() }
         /// control_led_disconnect.setOnClickListener { disconnect() }
 
         // Camera
@@ -88,9 +99,14 @@ class ControlActivity: AppCompatActivity() {
             preview.addView(it)
         }
 
+        Log.d(TAG, "OnCReate ! ");
+
 
         // This button will be used
-        control_led_disconnect.setOnClickListener { }
+        control_led_disconnect.setOnClickListener {
+            Log.d(TAG, "Take picture clicked")
+            doTakePicture()
+        }
 
     }
 
@@ -106,7 +122,6 @@ class ControlActivity: AppCompatActivity() {
                 "MyCameraApp"
         )
 
-        Log.d(TAG, mediaStorageDir.absolutePath)
         // This location works best if you want the created images to be shared
         // between applications and persist after your app has been uninstalled.
 
@@ -221,10 +236,8 @@ class ControlActivity: AppCompatActivity() {
                     // Take picture
                     // Send it to firebase
                     // Wait 10s before taking another picture
+                    Log.d("TAG", distance.toString())
                 }
-
-
-
             }
         }
 

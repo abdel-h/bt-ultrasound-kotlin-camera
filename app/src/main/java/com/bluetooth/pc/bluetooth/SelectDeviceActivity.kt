@@ -27,6 +27,7 @@ class SelectDeviceActivity : AppCompatActivity() {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        // startActivity<ControlActivity>()
         super.onCreate(savedInstanceState)
         setContentView(R.layout.select_device_layout)
 
@@ -55,7 +56,7 @@ class SelectDeviceActivity : AppCompatActivity() {
         if (!m_pairedDevices.isEmpty()) {
             for (device: BluetoothDevice in m_pairedDevices) {
                 list.add(device)
-                Log.i("device", ""+device)
+                Log.i("device", ""+device.name)
             }
         } else {
             toast("no paired bluetooth devices found")
